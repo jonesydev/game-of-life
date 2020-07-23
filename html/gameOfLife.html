@@ -1,0 +1,206 @@
+<!-- GameOfLife.html -->
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Game of Life</title>
+  <meta name="viewport" charset="utf-8" content="width=device-width, initial-scale=1">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <link rel="stylesheet" href="CSS/CellularAutomata/gameOfLife.css">
+  <script type="text/javascript" src="JS/CellularAutomata/gameOfLife.js"></script>  
+  <!-- script type="module" src="JS/CellularAutomata/gameOfLife.js"></script -->
+</head>
+
+<!--body bgcolor="LightGray";-->
+<body>
+
+<!-- <div class="gameBoard"> -->
+<div class="gameBoard" id="board" align="center">
+  <h1>Game of Life</h1>
+  <div><b>Select a Seed Pattern:</b>
+    <div>
+      <div class="tooltip">
+        <input type="checkbox" id="edgeWrapCheck">Edge Wrap</input>
+        <span class="tooltiptext">If checked, cells will wrap around to the other side of the grid.</span>
+      </div>
+      &nbsp
+      Still Life:
+      <div class="tooltip">
+        <select name="stillLife" onchange="GameOfLife.getPatternSeedStillLife(this.value);">
+          <option value="none"></option>
+          <option value="block">Block</option>
+          <option value="beehive">Beehive</option>
+          <option value="loaf">Loaf</option>
+          <option value="boat">Boat</option>
+          <option value="tub">Tub</option>
+        </select>
+        <span class="tooltiptext">A Still Life pattern does not change from one generation to the next.</span>
+      </div>
+      &nbsp
+      Oscillators:
+      <div class="tooltip">
+        <select name="oscillators" onchange="GameOfLife.getPatternSeedOscillators(this.value)">
+          <option value="none"></option>
+          <option value="blinker">Blinker</option>
+          <option value="toad">Toad</option>
+          <option value="beacon">Beacon</option>
+          <option value="pulsar">Pulsar</option>
+          <option value="pentadecathlon">Pentadecathlon</option>
+        </select>
+        <span class="tooltiptext">An Oscillator pattern returns to its original state after a finite number of generations.</span>
+      </div>
+      &nbsp
+      Spaceships:
+      <div class="tooltip">
+        <select name="spaceships" onchange="GameOfLife.getPatternSeedSpaceships(this.value)">
+          <option value="none"></option>
+          <option value="glider">Glider</option>
+          <option value="lightweightSpaceship">Lightweight Spaceship</option>
+          <option value="middleweightSpaceship">Middleweight Spaceship</option>
+          <option value="heavyweightSpaceship">Heavyweight Spaceship</option>
+        </select>
+        <span class="tooltiptext">A Spaceship pattern reappears after a finite number of generations in the same oreientaion but a different position.</span>
+      </div>
+      &nbsp
+      Methuselahs:
+      <div class="tooltip">
+        <select name="methuselahs" onchange="GameOfLife.getPatternSeedMethuselahs(this.value)">
+          <option value="none"></option>
+          <option value="rPentomino">R-pentomino</option>
+          <option value="diehard">Diehard</option>
+          <option value="acorn">Acorn</option>
+        </select>
+      <span class="tooltiptext">The Methuselah is a small seed pattern that takes more than 50 generations to stablize.</span>
+      </div>
+      &nbsp
+      Infinite:
+      <div class="tooltip">
+        <select name="infinite" onchange="GameOfLife.getPatternSeedInfinite(this.value)">
+          <option value="none"></option>
+          <option value="gosperGliderGun">Gosper Glider Gun</option>
+        </select>
+      <span class="tooltiptext">These just go on forever.</span>
+      </div>
+      &nbsp
+      <span><a href="gameOfLifeHelp.html" target="_blank">Help</a></span>
+      <br />
+      <br />
+      <div>
+        <b>Or Enter the Grid Dimension to create your own seed pattern:</b>
+        <div class="tooltip">
+          <input type="number" id="dimension">
+        <span class="tooltiptext">Creates a square grid of the dimension entered.</span>
+        </div>
+        &nbsp
+        Scale:
+        <div class="tooltip">
+          <select id="scale" onchange="GameOfLife.scale(this.value)">
+            <option value=1px>1px</option>
+            <option value=2px>2px</option>
+            <option value=3px>3px</option>
+            <option value=5px>5px</option>
+            <option value=7px>7px</option>
+            <option value=10px>10px</option>
+          </select>
+          <span class="tooltiptext">Changes the size of the cells in the grid.</span>
+        </div>
+        &nbsp
+        Rate:
+        <div class="tooltip">
+          <select id="rate" onchange="GameOfLife.rate(this.value)">
+            <option value=10>10ms</option>
+            <option value=125>125ms</option>
+            <option value=250>250ms</option>
+            <option value=500>500ms</option>
+            <option value=750>750ms</option>
+            <option value=1000>1000ms</option>
+          </select>
+          <span class="tooltiptext">Changes the rate at which the next generations are displayed.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br />
+  <div><b>Live Cells:</b> <label id="numberOfLiveCells"></label></div>
+  <div><b>Generations:</b> <label id="numberOfGenerations"></label></div>
+  <br />
+
+  <!-- Demo Button -->
+  <div class="tooltip">
+    <button type="button" id="demo" onclick="GameOfLife.demo();">Demo</button>
+    <span class="tooltiptext">Runs a demo of the game in action.</span>
+  </div>
+
+  <!-- New Seed Button -->
+  <div class="tooltip">
+    <button type="button" id="newSeed" onclick="GameOfLife.newSeed(document.getElementById('dimension').value);">New Seed</button>
+    <span class="tooltiptext">Creates a new grid with the dimension entered.</span>
+  </div>
+
+  <!--button type="button" id="create" onclick="createGrid(document.getElementById('dimension').value);">Create Grid</button-->
+  <!-- <button type="button" id="scale" onclick="GameOfLife.scale();">Scale</button> -->
+  <!-- <button type="button" id="rate" onclick="GameOfLife.rate();">Rate</button> -->
+
+  <!-- Step Button -->
+  <div class="tooltip">
+    <button type="button" id="step" onclick="GameOfLife.step();">Step</button>
+    <span class="tooltiptext">Moves forward one generation at a time.</span>
+  </div>
+
+  <!-- Step Back Button -->
+  <!-- <div class="tooltip">
+    <button type="button" id="stepBack" onclick="GameOfLife.stepBack();">Step Back</button>
+    <span class="tooltiptext">Moves backward one generation at a time.</span>
+  </div> -->
+
+  <!-- Start Button -->
+  <div class="tooltip">
+    <button type="button" id="start" onclick="GameOfLife.start();">Start</button>
+    <span class="tooltiptext">Starts the Game of Life.</span>
+  </div>
+
+  <!-- <button type="button" id="pause" onclick="GameOfLife.pause();">Pause</button> -->
+  <!-- <button type="button" id="resume" onclick="GameOfLife.resume();">Continue</button> -->
+
+  <!-- Stop Button -->
+  <div class="tooltip">
+    <button type="button" id="stop" onclick="GameOfLife.stop();">Stop</button>
+    <span class="tooltiptext">Stops the Game of Life.</span>
+  </div>
+
+  <!-- Show Neighbors Button -->
+  <div class="tooltip">
+    <button type="button" id="showCellNeighbors" onclick="GameOfLife.showCellNeighbors();">Show Neighbors</button>
+    <span class="tooltiptext">Displays the selected cell's neighbors.</span>
+  </div>
+
+  <!-- Reset Button -->
+  <div class="tooltip">
+    <button type="button" id="reset" onclick="GameOfLife.reset();">Reset</button>
+    <span class="tooltiptext">Resets the grid back to the initial seed pattern.</span>
+  </div>
+
+  <!-- Clear Grid Button -->
+  <div class="tooltip">
+    <button type="button" id="clear" onclick="GameOfLife.clearGrid('cell');">Clear Grid</button>
+    <span class="tooltiptext">Keeps the grid but clears the pattern.</span>
+  </div>
+
+  <!-- Refresh Button -->
+  <div class="tooltip">
+    <button type="button" id="refresh" onclick="GameOfLife.refresh();">Refresh</button>
+    <span class="tooltiptext">Clears out the pattern AND the grid.</span>
+  </div>
+
+  <!-- Save Button -->
+  <div class="tooltip">
+    <button type="button" id="save" onclick="GameOfLife.save();">Save</button>
+    <span class="tooltiptext">Save seed patterns you created.</span>
+  </div>
+
+  <label id="numberOfGenerations" text="Generations: "></label>
+  <br />
+</div>
+
+</body>
+</html>
